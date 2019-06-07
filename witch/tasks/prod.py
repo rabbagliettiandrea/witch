@@ -5,16 +5,10 @@ from django.conf import settings
 from witch import slackbot
 from witch.tasks import utils
 
-print(os.path.join(settings.DOCKER_CONFIG_PATH, settings.DOCKER_MACHINE_HOST))
-
 DOCKER_MACHINE_ENV = {
     'DOCKER_TLS_VERIFY': '1',
     'DOCKER_HOST': f'tcp://{settings.DOCKER_MACHINE_HOST}:2376',
-    'DOCKER_CERT_PATH': os.path.join(
-        settings.DOCKER_CONFIG_PATH, 
-        '/machine/machines/',
-        settings.DOCKER_MACHINE_HOST
-    ),
+    'DOCKER_CERT_PATH': settings.DOCKER_CERT_PATH,
     'DOCKER_MACHINE_NAME': settings.DOCKER_MACHINE_HOST
 }
 
