@@ -7,9 +7,9 @@ from witch.tasks import utils
 
 DOCKER_MACHINE_ENV = {
     'DOCKER_TLS_VERIFY': '1',
-    'DOCKER_HOST': f'tcp://{settings.DOCKER_MACHINE_HOST}:2376',
-    'DOCKER_CERT_PATH': settings.DOCKER_CERT_PATH,
-    'DOCKER_MACHINE_NAME': settings.DOCKER_MACHINE_HOST
+    'DOCKER_HOST': 'tcp://{}:2376'.format(settings.WITCH_DOCKER_MACHINE['host']),
+    'DOCKER_CERT_PATH': settings.WITCH_DOCKER_MACHINE['cert_path'],
+    'DOCKER_MACHINE_NAME': settings.WITCH_DOCKER_MACHINE['name']
 }
 
 
@@ -30,13 +30,15 @@ def logs(ctx, follow=False):
 
 @task
 def deploy(ctx):
-    slackbot.send('Deploy *started* :satellite_antenna:')
     utils.collect_static(ctx)
     utils.issue_certs(ctx)
-    ctx.run(f'ssh {settings.DOCKER_MACHINE_USER}@{settings.DOCKER_MACHINE_HOST} -C "sudo docker image prune -a -f"')
+    ctx.run('ssh {}@{} -C "sudo docker image prune -a -f"'.format(
+        settings.WITCH_DOCKER_MACHINE['user'],
+        settings.WITCH_DOCKER_MACHINE['host']
+    ))
     ctx.run(
         'docker-compose -f docker-compose.prod.yml up -d --build --remove-orphans',
         env=DOCKER_MACHINE_ENV
     )
     utils.print_task_done()
-    slackbot.send('Deploy *ended* :satellite:')
+    slackbot.send('Deploy *ended* :satellite_antenna:')

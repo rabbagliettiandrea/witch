@@ -1,0 +1,15 @@
+README.md
+setup.py
+witch/__init__.py
+witch/main.py
+witch/slackbot.py
+witch.egg-info/PKG-INFO
+witch.egg-info/SOURCES.txt
+witch.egg-info/dependency_links.txt
+witch.egg-info/entry_points.txt
+witch.egg-info/requires.txt
+witch.egg-info/top_level.txt
+witch/tasks/__init__.py
+witch/tasks/dev.py
+witch/tasks/prod.py
+witch/tasks/utils.py
