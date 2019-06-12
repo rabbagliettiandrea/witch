@@ -1,3 +1,0 @@
-[console_scripts]
-witch = witch.main:program.run
-
