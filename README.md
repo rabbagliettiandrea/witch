@@ -8,8 +8,8 @@ Just a _useful_ devops tool.
 
 ## Why did you choose the name Witch
 
-A _witch_ can - in some way - invoke some spells and casts :) At the same time, witch can use [invoke](https://github.com/pyinvoke/invoke) to call procedures!
+A _witch_ can - in some way - [invoke](https://github.com/pyinvoke/invoke) some spells and casts or.. procedures :)
 
 ## Install
 
-`pipenv install -e git+https://github.com/spesa-online/witch.git#egg=witch`
+`pipenv install -e git+https://github.com/spesa-online/witch.git@master#egg=witch`
