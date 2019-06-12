@@ -28,9 +28,11 @@ def logs(ctx, follow=False):
     )
 
 
-@task(pre=[utils.collect_static, utils.issue_certs])
+@task
 def deploy(ctx):
     slackbot.send('Deploy *started* :satellite_antenna:')
+    utils.collect_static(ctx)
+    utils.issue_certs(ctx)
     ctx.run(f'ssh {settings.DOCKER_MACHINE_USER}@{settings.DOCKER_MACHINE_HOST} -C "sudo docker image prune -a -f"')
     ctx.run(
         'docker-compose -f docker-compose.prod.yml up -d --build --remove-orphans',
