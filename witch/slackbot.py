@@ -12,7 +12,7 @@ class SlackError(Exception):
 def send(message, channel=_ALERTS_CHANNEL):   
     client = WebClient(token=settings.SLACK_TOKEN) 
     response = client.chat_postMessage(
-        text=f'*{PROJECT_NAME}* {message}',
+        text='`{}` {}'.format(PROJECT_NAME.upper(), message),
         channel=channel
     )
     if not response.get('ok', False):
