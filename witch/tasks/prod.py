@@ -12,6 +12,7 @@ DOCKER_MACHINE_ENV = {
     'DOCKER_MACHINE_NAME': settings.WITCH_DOCKER_MACHINE['name']
 }
 
+ENV_PROD_FILENAME = '.env.prod'
 
 @task
 def ps(ctx):
@@ -30,6 +31,9 @@ def logs(ctx, follow=False):
 
 @task
 def deploy(ctx):
+    if not os.path.isfile(ENV_PROD_FILENAME):
+        utils.print_error('No {} found'.format(ENV_PROD_FILENAME))
+        return
     utils.collect_static(ctx)
     utils.issue_certs(ctx)
     ctx.run('ssh {}@{} -C "sudo docker image prune -a -f"'.format(
