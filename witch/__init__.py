@@ -1,12 +1,8 @@
 import os
-import subprocess
-import shlex
 from pathlib import Path
 import sys
 
-VERSION = '0.1.dev-{}'.format(
-    subprocess.check_output(shlex.split('git rev-parse --short HEAD')).rstrip().decode()
-)
+VERSION = '0.1.dev-1'
 
 PROJECT_NAME = os.path.basename(os.path.normpath(Path().absolute()))
 
