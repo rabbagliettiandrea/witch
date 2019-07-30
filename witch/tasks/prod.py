@@ -35,7 +35,6 @@ def deploy(ctx):
         utils.print_error('No {} found'.format(ENV_PROD_FILENAME))
         return
     utils.collect_static(ctx)
-    utils.issue_certs(ctx)
     ctx.run('ssh {}@{} -C "sudo docker image prune -a -f"'.format(
         settings.WITCH_DOCKER_MACHINE['user'],
         settings.WITCH_DOCKER_MACHINE['host']
