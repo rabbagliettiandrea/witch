@@ -1,4 +1,3 @@
-import os
 from invoke import task
 from django.conf import settings
 
@@ -12,7 +11,6 @@ DOCKER_MACHINE_ENV = {
     'DOCKER_MACHINE_NAME': settings.WITCH_DOCKER_MACHINE['name']
 }
 
-ENV_PROD_FILENAME = '.env.prod'
 
 @task
 def ps(ctx):
@@ -28,12 +26,9 @@ def logs(ctx, follow=False):
         env=DOCKER_MACHINE_ENV
     )
 
-
 @task
 def deploy(ctx):
-    if not os.path.isfile(ENV_PROD_FILENAME):
-        utils.print_error('No {} found'.format(ENV_PROD_FILENAME))
-        return
+    utils.get_aws_secrets(ctx)
     utils.collect_static(ctx)
     ctx.run('ssh {}@{} -C "sudo docker image prune -a -f"'.format(
         settings.WITCH_DOCKER_MACHINE['user'],
