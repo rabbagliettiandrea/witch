@@ -41,7 +41,6 @@ def abort():
 
 @task
 def get_aws_secrets(ctx):
-    ENV_PROD_FILENAME = '.env.prod'
     session = boto3.session.Session()
     client = session.client(service_name='secretsmanager',  region_name=settings.WITCH_AWS_SECRET['region'])
     get_secret_value_response = client.get_secret_value(SecretId=settings.WITCH_AWS_SECRET['name'])
@@ -49,7 +48,7 @@ def get_aws_secrets(ctx):
     if not secrets:
         print_error('AWS Data secrets empty')
         abort()
-    with open(ENV_PROD_FILENAME, 'w') as fd:
+    with open('.env.prod', 'w') as fd:
         fd.write(secrets + '\n')
 
 
