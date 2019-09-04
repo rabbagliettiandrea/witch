@@ -61,7 +61,7 @@ def collect_static(ctx):
         'pipenv run python manage.py collectstatic --clear --noinput --verbosity 0',
         env={
             'DJANGO_SERVE_STATIC': '0',
-            'PIPENV_VERBOSITY=-1': '1'
+            'PIPENV_VERBOSITY': '-1'
         }
     )
     print_task_done()
