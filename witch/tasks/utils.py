@@ -41,6 +41,8 @@ def abort():
 
 @task
 def get_aws_secrets(ctx):
+    if not hasattr(settings, 'WITCH_AWS_SECRET'):
+        return
     session = boto3.session.Session()
     client = session.client(service_name='secretsmanager',  region_name=settings.WITCH_AWS_SECRET['region'])
     get_secret_value_response = client.get_secret_value(SecretId=settings.WITCH_AWS_SECRET['name'])
@@ -57,6 +59,9 @@ def collect_static(ctx):
     print_info('Running collectstatic')
     ctx.run(
         'pipenv run python manage.py collectstatic --clear --noinput --verbosity 0',
-        env={'DJANGO_SERVE_STATIC': '0'}
+        env={
+            'DJANGO_SERVE_STATIC': '0',
+            'PIPENV_VERBOSITY=-1': '1'
+        }
     )
     print_task_done()
