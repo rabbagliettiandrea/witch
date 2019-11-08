@@ -70,3 +70,15 @@ def collect_static(ctx):
         }
     )
     print_task_done()
+    
+
+@task
+def migrate(ctx):
+    print_info('Running migrate')
+    ctx.run(
+        'pipenv run python manage.py migrate',
+        env={
+            'PIPENV_VERBOSITY': '-1'
+        }
+    )
+    print_task_done()
