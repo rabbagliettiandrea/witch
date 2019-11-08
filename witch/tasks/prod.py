@@ -29,6 +29,7 @@ def logs(ctx, follow=False):
 @task
 def deploy(ctx):
     with utils.aws_secrets(ctx):
+        utils.migrate(ctx)
         utils.collect_static(ctx)
         ctx.run('ssh {}@{} -C "sudo docker image prune -a -f"'.format(
             settings.WITCH_DOCKER_MACHINE['user'],
