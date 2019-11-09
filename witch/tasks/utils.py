@@ -63,7 +63,7 @@ def aws_secrets(ctx):
 def collect_static(ctx):
     print_info('Running collectstatic')
     ctx.run(
-        'pipenv run python manage.py collectstatic --clear --noinput --verbosity 0',
+        'python manage.py collectstatic --clear --noinput --verbosity 0',
         env={'DEBUG': '0'}
     )
     print_task_done()
@@ -72,5 +72,5 @@ def collect_static(ctx):
 @task
 def migrate(ctx):
     print_info('Running migrate')
-    ctx.run('pipenv run python manage.py migrate')
+    ctx.run('python manage.py migrate')
     print_task_done()
