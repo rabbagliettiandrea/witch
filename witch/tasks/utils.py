@@ -44,7 +44,7 @@ def abort():
 def aws_secrets(ctx):
     if hasattr(settings, 'WITCH_AWS_SECRET'):
         FILENAME = '.env.prod'
-        session = boto3.session.Session()
+        session = boto3.session.Session(profile_name=settings.WITCH_AWS_SECRET['profile'])
         client = session.client(service_name='secretsmanager',  region_name=settings.WITCH_AWS_SECRET['region'])
         get_secret_value_response = client.get_secret_value(SecretId=settings.WITCH_AWS_SECRET['name'])
         secrets = get_secret_value_response['SecretString']
