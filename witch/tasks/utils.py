@@ -55,7 +55,7 @@ def aws_secrets(ctx):
         with open(FILENAME, 'w') as fd:
             fd.write(secrets + '\n')
         yield
-        print_success('Removing .env.prod file')
+        print_info('Removing .env.prod file')
         os.remove(FILENAME)
     else:
         print_info('Skipping AWS Secret - no settings found')
