@@ -43,6 +43,7 @@ def abort():
 @contextmanager
 def aws_secrets(ctx):
     if hasattr(settings, 'WITCH_AWS_SECRET'):
+        print_info('Downloading AWS Secret')
         FILENAME = '.env.prod'
         session = boto3.session.Session(profile_name=settings.WITCH_AWS_SECRET['profile'])
         client = session.client(service_name='secretsmanager',  region_name=settings.WITCH_AWS_SECRET['region'])
@@ -54,8 +55,10 @@ def aws_secrets(ctx):
         with open(FILENAME, 'w') as fd:
             fd.write(secrets + '\n')
         yield
+        print_success('Removing .env.prod file')
         os.remove(FILENAME)
     else:
+        print_info('Skipping AWS Secret - no settings found')
         yield
         
 
