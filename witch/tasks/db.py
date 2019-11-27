@@ -8,6 +8,9 @@ import subprocess
 from django.conf import settings
 from django.core.management import BaseCommand, call_command
 
+import django
+
+django.setup()
 
 COMMANDS = {
     'drop': '/usr/local/bin/dropdb --if-exists '
