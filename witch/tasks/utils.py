@@ -7,9 +7,7 @@ from invoke.exceptions import Failure
 from termcolor import colored
 
 import boto3
-from contextlib import contextmanager, nullcontext
-
-from witch import PROJECT_NAME
+from contextlib import contextmanager
 
 
 def _print_colored(msg, color):
@@ -44,23 +42,23 @@ def abort():
 def aws_secrets(ctx):
     if hasattr(settings, 'WITCH_AWS_SECRET'):
         print_info('Downloading AWS Secret')
-        FILENAME = '.env.prod'
+        filename = '.env.prod'
         session = boto3.session.Session(profile_name=settings.WITCH_AWS_SECRET['profile'])
-        client = session.client(service_name='secretsmanager',  region_name=settings.WITCH_AWS_SECRET['region'])
+        client = session.client(service_name='secretsmanager', region_name=settings.WITCH_AWS_SECRET['region'])
         get_secret_value_response = client.get_secret_value(SecretId=settings.WITCH_AWS_SECRET['name'])
         secrets = get_secret_value_response['SecretString']
         if not secrets:
             print_error('AWS Data secrets empty')
             abort()
-        with open(FILENAME, 'w') as fd:
+        with open(filename, 'w') as fd:
             fd.write(secrets + '\n')
         yield
         print_info('Removing .env.prod file')
-        os.remove(FILENAME)
+        os.remove(filename)
     else:
         print_info('Skipping AWS Secret - no settings found')
         yield
-        
+
 
 @task
 def collect_static(ctx):
@@ -70,7 +68,7 @@ def collect_static(ctx):
         env={'DEBUG': '0'}
     )
     print_task_done()
-    
+
 
 @task
 def migrate(ctx):
