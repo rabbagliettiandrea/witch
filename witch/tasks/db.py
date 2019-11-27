@@ -14,27 +14,30 @@ django.setup()
 
 COMMANDS = {
     'drop': '/usr/local/bin/dropdb --if-exists '
-            '-h {restore_host} -U {db_user} {db_name}',
+            '-h {restore_host} -p {restore_port} -U {db_user} {db_name}',
     'create': '/usr/local/bin/createdb '
-              '-h {restore_host} -U {db_user} {db_name}',
+              '-h {restore_host} -p {restore_port} -U {db_user} {db_name}',
     'dump': '/usr/local/bin/pg_dump --compress=9 --no-acl --format=c --no-owner '
-            '-h {dump_host} -U {db_user_readonly} -d {db_name}',
+            '-h {dump_host} -p {dump_port} -U {db_user_readonly} -d {db_name}',
     'restore': '/usr/local/bin/pg_restore '
-               '-h {restore_host} -U {db_user} -d {db_name}'
+               '-h {restore_host} -p {restore_port} -U {db_user} -d {db_name}'
 }
 
 
 def _get_params():
-    local_host = settings.DATABASES['default']['HOST']
-    if 'rds.amazonaws.com' in local_host:
+    restore_host = settings.DATABASES['default']['HOST']
+    restore_port = settings.DATABASES['default']['PORT']
+    if 'rds.amazonaws.com' in restore_host:
         utils.print_error('[DISASTER PROTECTION] You\'re trying to restore to Amazon RDS')
         utils.abort()
     return {
-        'restore_host': local_host,
+        'restore_host': restore_host,
+        'restore_port': restore_port,
         'restore_password': settings.DATABASES['default']['PASSWORD'],
         'db_user': settings.DATABASES['default']['USER'],
         'db_name': settings.DATABASES['default']['NAME'],
         'dump_host': settings.DATABASE_READONLY_HOST,
+        'dump_port': settings.DATABASE_READONLY_PORT,
         'db_user_readonly': settings.DATABASE_READONLY_USER,
         'db_password_readonly': settings.DATABASE_READONLY_PASSWORD
     }
