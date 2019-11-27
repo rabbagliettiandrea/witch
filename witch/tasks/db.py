@@ -74,7 +74,7 @@ def download(ctx):
         )
         p_restore.communicate()
         call_command('migrate', interactive=False)
-        utils.print_success('\nSuccessfully synced DB with new migrations')
+        utils.print_success('Successfully synced DB with new migrations')
     except subprocess.CalledProcessError:
         utils.abort()
     utils.print_task_done()
