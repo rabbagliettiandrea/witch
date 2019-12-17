@@ -3,7 +3,7 @@ import os
 from django.conf import settings
 
 from invoke import task
-from invoke.exceptions import Failure
+from invoke.exceptions import Exit
 from termcolor import colored
 
 import boto3
@@ -35,7 +35,7 @@ def print_error(msg):
 
 
 def abort():
-    raise Failure
+    raise Exit(code=-1)
 
 
 @contextmanager
