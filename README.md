@@ -12,4 +12,4 @@ A _witch_ can - in some way - [invoke](https://github.com/pyinvoke/invoke) some 
 
 ## Install
 
-`pipenv install -e git+https://github.com/spesa-online/witch.git@master#egg=witch`
+`pipenv install -e git+https://github.com/silverfix/witch.git@master#egg=witch`
