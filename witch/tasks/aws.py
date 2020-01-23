@@ -45,6 +45,8 @@ def s3download(ctx):
             if not os.path.exists(download_to):
                 utils.print_info('Downloading {}'.format(key))
                 client.download_file(bucket, key, download_to)
+            else:
+                utils.print_warning('Skipping {}')
 
         paginator = client.get_paginator('list_objects')
         for result in paginator.paginate(Bucket=bucket, Delimiter='/', Prefix=folder):
