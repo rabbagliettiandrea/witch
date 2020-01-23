@@ -7,6 +7,8 @@ from django.conf import settings
 import boto3
 from contextlib import contextmanager
 
+from invoke import task
+
 from witch.tasks import utils
 
 
@@ -32,9 +34,8 @@ def dump_secrets(ctx):
         yield
 
 
-@contextmanager
+@task
 def s3download(ctx):
-
     def traverse_dirs(folder):
         def task(key):
             nonlocal pos
