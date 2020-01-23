@@ -46,7 +46,7 @@ def s3download(ctx):
                 utils.print_info('Downloading {}'.format(key))
                 client.download_file(bucket, key, download_to)
             else:
-                utils.print_warning('Skipping {}')
+                utils.print_warning('Skipping {}'.format(key))
 
         paginator = client.get_paginator('list_objects')
         for result in paginator.paginate(Bucket=bucket, Delimiter='/', Prefix=folder):
