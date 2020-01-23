@@ -38,18 +38,14 @@ def dump_secrets(ctx):
 def s3download(ctx):
     def traverse_dirs(folder):
         def task(key):
-            nonlocal pos
             download_to = os.path.join('.', key)
             with lock:
                 if not os.path.exists(os.path.dirname(download_to)):
                     os.makedirs(os.path.dirname(download_to))
             if not os.path.exists(download_to):
-                utils.print_info('Downloading {}: {}'.format(pos, key))
+                utils.print_info('Downloading {}'.format(key))
                 client.download_file(bucket, key, download_to)
-            with lock:
-                pos += 1
 
-        pos = 0
         paginator = client.get_paginator('list_objects')
         for result in paginator.paginate(Bucket=bucket, Delimiter='/', Prefix=folder):
             if result.get('CommonPrefixes') is not None:
