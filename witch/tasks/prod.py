@@ -2,7 +2,7 @@ from invoke import task
 from django.conf import settings
 
 from witch import slackbot
-from witch.tasks import utils
+from witch.tasks import aws
 
 DOCKER_MACHINE_ENV = {
     'DOCKER_TLS_VERIFY': '1',
@@ -28,7 +28,7 @@ def logs(ctx, follow=False):
 
 @task
 def deploy(ctx):
-    with utils.aws_secrets(ctx):
+    with aws.dump_secrets(ctx):
         utils.migrate(ctx)
         utils.collect_static(ctx)
         ctx.run('ssh {}@{} -C "sudo docker image prune -a -f"'.format(
