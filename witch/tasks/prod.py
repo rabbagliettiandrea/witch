@@ -2,7 +2,7 @@ from invoke import task
 from django.conf import settings
 
 from witch import slackbot
-from witch.tasks import aws
+from witch.tasks import aws, utils
 
 DOCKER_MACHINE_ENV = {
     'DOCKER_TLS_VERIFY': '1',
