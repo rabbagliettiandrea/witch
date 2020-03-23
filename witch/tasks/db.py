@@ -25,21 +25,22 @@ COMMANDS = {
 
 
 def _get_params():
-    restore_host = settings.DATABASES['default']['HOST']
-    restore_port = settings.DATABASES['default']['PORT']
+    db_default = settings.DATABASES['default']
+    db_readonly = settings.DATABASES['read-only']
+    restore_host = db_default['HOST']
     if 'rds.amazonaws.com' in restore_host:
         utils.print_error('[DISASTER PROTECTION] You\'re trying to restore to Amazon RDS')
         utils.abort()
     return {
         'restore_host': restore_host,
-        'restore_port': restore_port,
-        'restore_password': settings.DATABASES['default']['PASSWORD'],
-        'db_user': settings.DATABASES['default']['USER'],
-        'db_name': settings.DATABASES['default']['NAME'],
-        'dump_host': settings.DATABASE_READONLY_HOST,
-        'dump_port': settings.DATABASE_READONLY_PORT,
-        'db_user_readonly': settings.DATABASE_READONLY_USER,
-        'db_password_readonly': settings.DATABASE_READONLY_PASSWORD
+        'restore_port': db_default['PORT'],
+        'restore_password': db_default['PASSWORD'],
+        'db_user': db_default['USER'],
+        'db_name': db_default['NAME'],
+        'dump_host': db_readonly['HOST'],
+        'dump_port': db_readonly['PORT'],
+        'db_user_readonly': db_readonly['USER'],
+        'db_password_readonly': db_readonly['PASSWORD']
     }
 
 
