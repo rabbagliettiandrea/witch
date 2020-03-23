@@ -37,10 +37,10 @@ def _get_params():
         'restore_password': db_default['PASSWORD'],
         'db_user': db_default['USER'],
         'db_name': db_default['NAME'],
-        'dump_host': db_readonly['HOST'],
-        'dump_port': db_readonly['PORT'],
-        'db_user_readonly': db_readonly['USER'],
-        'db_password_readonly': db_readonly['PASSWORD']
+        'dump_host': db_replica['HOST'],
+        'dump_port': db_replica['PORT'],
+        'db_user_readonly': db_replica['USER'],
+        'db_password_readonly': db_replica['PASSWORD']
     }
 
 
