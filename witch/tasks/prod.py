@@ -41,3 +41,9 @@ def deploy(ctx):
         )
     utils.print_task_done()
     slackbot.send('Deploy *ended* :satellite_antenna:')
+
+
+@task
+def exec(ctx, service='django', command='bash'):
+    cmd = 'docker-compose -f docker-compose.prod.yml exec {} {}'.format(service, command)
+    ctx.run(cmd, env=DOCKER_MACHINE_ENV, pty=True)
