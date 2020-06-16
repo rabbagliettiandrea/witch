@@ -28,7 +28,7 @@ def _get_params():
     db_default = settings.DATABASES['default']
     db_replica = settings.DATABASES['replica']
     restore_host = db_default['HOST']
-    if 'rds.amazonaws.com' in restore_host:
+    if 'amazonaws.com' in restore_host:
         utils.print_error('[DISASTER PROTECTION] You\'re trying to restore to Amazon RDS')
         utils.abort()
     return {
