@@ -10,5 +10,6 @@ namespace.add_collection(db)
 namespace.add_collection(utils)
 namespace.add_collection(aws)
 namespace.add_task(prod.deploy)
+namespace.add_task(prod.logs)
 
 program = Program(namespace=namespace, version=VERSION)
