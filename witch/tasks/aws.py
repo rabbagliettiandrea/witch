@@ -30,7 +30,6 @@ def dump_secrets(ctx):
         utils.print_info('Removing .env.prod file')
         os.remove(filename)
     else:
-        utils.print_info('Skipping AWS Secret - no settings found')
         yield
 
 
