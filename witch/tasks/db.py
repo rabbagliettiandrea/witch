@@ -14,13 +14,13 @@ django.setup()
 
 COMMANDS = {
     'drop': '/usr/local/bin/dropdb --if-exists '
-            '-h {restore_host} -p {restore_port} -U {db_user} {db_name}',
+            '-h {restore_host} -p {restore_port} -U {restore_user} {restore_name}',
     'create': '/usr/local/bin/createdb '
-              '-h {restore_host} -p {restore_port} -U {db_user} {db_name}',
+              '-h {restore_host} -p {restore_port} -U {restore_user} {restore_name}',
     'dump': '/usr/local/bin/pg_dump --compress=9 --no-acl --format=c --no-owner '
-            '-h {dump_host} -p {dump_port} -U {db_user_readonly} -d {db_name}',
+            '-h {dump_host} -p {dump_port} -U {dump_user} -d {dump_name}',
     'restore': '/usr/local/bin/pg_restore '
-               '-h {restore_host} -p {restore_port} -U {db_user} -d {db_name}'
+               '-h {restore_host} -p {restore_port} -U {restore_user} -d {restore_name}'
 }
 
 
@@ -34,13 +34,15 @@ def _get_params():
     return {
         'restore_host': restore_host,
         'restore_port': db_default['PORT'],
+        'restore_user': db_default['USER'],
         'restore_password': db_default['PASSWORD'],
-        'db_user': db_default['USER'],
-        'db_name': db_default['NAME'],
+        'restore_name': db_default['NAME'],
+
         'dump_host': db_replica['HOST'],
         'dump_port': db_replica['PORT'],
-        'db_user_readonly': db_replica['USER'],
-        'db_password_readonly': db_replica['PASSWORD']
+        'dump_user': db_replica['USER'],
+        'dump_password': db_replica['PASSWORD'],
+        'dump_name': db_replica['NAME']
     }
 
 
@@ -67,7 +69,7 @@ def download(ctx):
         )
         utils.print_warning('Running pg_restore with pg_dump pipelining')
         p_dump = subprocess.Popen(
-            args=commands['dump'], env={'PGPASSWORD': params['db_password_readonly']},
+            args=commands['dump'], env={'PGPASSWORD': params['dump_password']},
             stdout=subprocess.PIPE,
             bufsize=0
         )
