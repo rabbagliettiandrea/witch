@@ -4,12 +4,17 @@ from django.conf import settings
 from witch import slackbot
 from witch.tasks import aws, utils
 
-DOCKER_MACHINE_ENV = {
-    'DOCKER_TLS_VERIFY': '1',
-    'DOCKER_HOST': 'tcp://{}:2376'.format(settings.WITCH_DOCKER_MACHINE['host']),
-    'DOCKER_CERT_PATH': settings.WITCH_DOCKER_MACHINE['cert_path'],
-    'DOCKER_MACHINE_NAME': settings.WITCH_DOCKER_MACHINE['name']
-}
+import functools
+
+WITCH_DOCKER_MACHINE = getattr(settings, 'WITCH_DOCKER_MACHINE', None)
+
+if WITCH_DOCKER_MACHINE:
+    DOCKER_MACHINE_ENV = {
+        'DOCKER_TLS_VERIFY': '1',
+        'DOCKER_HOST': 'tcp://{}:2376'.format(WITCH_DOCKER_MACHINE['host']),
+        'DOCKER_CERT_PATH': WITCH_DOCKER_MACHINE['cert_path'],
+        'DOCKER_MACHINE_NAME': WITCH_DOCKER_MACHINE['name']
+    }
 
 
 @task
@@ -25,6 +30,7 @@ def logs(ctx, follow=False):
         '{} -f'.format(cmd) if follow else cmd,
         env=DOCKER_MACHINE_ENV
     )
+
 
 @task
 def deploy(ctx):
