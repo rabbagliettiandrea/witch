@@ -13,7 +13,7 @@ DOCKER_MACHINE_ENV = {
 @task
 def start_db(ctx):
     ctx.run(
-        'docker-compose -f docker-compose.dev.yml up -d --build --remove-orphans',
+        'docker-compose -f docker-compose.yml up -d --build --remove-orphans',
         env=DOCKER_MACHINE_ENV
     )
     print_task_done()
