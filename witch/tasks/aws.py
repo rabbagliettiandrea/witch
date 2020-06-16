@@ -37,12 +37,15 @@ def dump_secrets(ctx):
 def s3download(ctx):
     def traverse_dirs(folder):
         def task(key):
-            download_to = os.path.join('.', key)
+            download_to = os.path.join('.', key).replace(
+                '/{}'.format(settings.AWS_LOCATION),
+                '/{}'.format(os.path.basename(settings.MEDIA_ROOT))
+            )
             with lock:
                 if not os.path.exists(os.path.dirname(download_to)):
                     os.makedirs(os.path.dirname(download_to))
             if not os.path.exists(download_to):
-                utils.print_info('Downloading {}'.format(key))
+                utils.print_info('Downloading {} -> {}'.format(key, download_to))
                 client.download_file(bucket, key, download_to)
             else:
                 utils.print_warning('Skipping {}'.format(key))
