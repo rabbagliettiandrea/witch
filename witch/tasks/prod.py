@@ -6,6 +6,8 @@ from witch.tasks import aws, utils
 
 import functools
 
+from time import sleep
+
 WITCH_DOCKER_MACHINE = getattr(settings, 'WITCH_DOCKER_MACHINE', None)
 
 if WITCH_DOCKER_MACHINE:
@@ -32,6 +34,22 @@ def logs(ctx, follow=False):
     )
 
 
+def start_service(ctx, service):
+    return ctx.run(
+        'docker-compose -f docker-compose.prod.yml '
+        'up -d --build --remove-orphans {}'.format(service),
+        env=DOCKER_MACHINE_ENV
+    )
+
+
+def check_service(ctx, service):
+    return ctx.run(
+        'docker-compose -f docker-compose.prod.yml '
+        'exec nginx curl {}:8000 --head'.format(service),
+        env=DOCKER_MACHINE_ENV, pty=True, warn=True, hide=True
+    )
+
+
 @task
 def deploy(ctx):
     with aws.dump_secrets(ctx):
@@ -41,10 +59,12 @@ def deploy(ctx):
             settings.WITCH_DOCKER_MACHINE['user'],
             settings.WITCH_DOCKER_MACHINE['host']
         ))
-        ctx.run(
-            'docker-compose -f docker-compose.prod.yml up -d --build --remove-orphans',
-            env=DOCKER_MACHINE_ENV
-        )
+        start_service(ctx, 'nginx')
+        start_service(ctx, 'django_blue')
+        while not check_service(ctx, 'django_blue').ok:
+            sleep(1)
+            utils.print_info('Sleeping waiting for "django_blue"')
+        start_service(ctx, 'django_green')
     utils.print_task_done()
     slackbot.send('Deploy *ended* :satellite_antenna:')
 
