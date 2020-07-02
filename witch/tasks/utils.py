@@ -32,16 +32,6 @@ def abort():
 
 
 @task
-def collect_static(ctx):
-    print_info('Running collectstatic')
-    ctx.run(
-        'python manage.py collectstatic --clear --noinput --verbosity 0',
-        env={'DEBUG': '0'}
-    )
-    print_task_done()
-
-
-@task
 def migrate(ctx):
     print_info('Running migrate')
     ctx.run('python manage.py migrate')
