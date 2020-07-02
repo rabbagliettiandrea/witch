@@ -34,10 +34,13 @@ def logs(ctx, follow=False):
     )
 
 
-def start_service(ctx, service):
+def start_service(ctx, service, rebuild=False):
     return ctx.run(
         'docker-compose -f docker-compose.prod.yml '
-        'up -d --build --remove-orphans {}'.format(service),
+        'up -d {build_param} --remove-orphans {service}'.format(
+            build_param='--build' if rebuild else '',
+            service=service
+        ),
         env=DOCKER_MACHINE_ENV
     )
 
@@ -58,12 +61,14 @@ def deploy(ctx):
             settings.WITCH_DOCKER_MACHINE['user'],
             settings.WITCH_DOCKER_MACHINE['host']
         ))
-        start_service(ctx, 'nginx')
-        start_service(ctx, 'django-blue')
+        start_service(ctx, 'nginx', rebuild=True)
+        start_service(ctx, 'django-blue', rebuild=True)
         while not check_service(ctx, 'django-blue').ok:
             sleep(1)
             utils.print_info('Sleeping waiting for "django-blue"')
         start_service(ctx, 'django-green')
+        start_service(ctx, 'worker')
+        start_service(ctx, 'beat')
     utils.print_task_done()
     slackbot.send('Deploy *ended* :satellite_antenna:')
 
