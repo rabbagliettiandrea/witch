@@ -74,6 +74,6 @@ def deploy(ctx):
 
 
 @task
-def exec(ctx, service='django', command='bash'):
+def exec(ctx, service='django-green', command='bash'):
     cmd = 'docker-compose -f docker-compose.prod.yml exec {} {}'.format(service, command)
     ctx.run(cmd, env=DOCKER_MACHINE_ENV, pty=True)
