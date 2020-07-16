@@ -13,7 +13,7 @@ from witch.tasks import utils
 
 
 @contextmanager
-def dump_secrets(ctx):
+def download_secrets(ctx):
     if hasattr(settings, 'WITCH_AWS_SECRET'):
         utils.print_info('Downloading AWS Secret')
         filename = '.env.prod'
