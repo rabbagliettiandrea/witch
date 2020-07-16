@@ -35,7 +35,7 @@ def download_secrets(ctx):
 
 @task
 def s3download(ctx):
-    def traverse_dirs(folder):
+    def traverse_dirs(folder, lock=threading.Lock()):
         def task(key):
             download_to = os.path.join('.', key).replace(
                 '/{}'.format(settings.AWS_LOCATION),
@@ -54,15 +54,13 @@ def s3download(ctx):
         for result in paginator.paginate(Bucket=bucket, Delimiter='/', Prefix=folder):
             if result.get('CommonPrefixes') is not None:
                 for subdir in result.get('CommonPrefixes'):
-                    traverse_dirs(subdir.get('Prefix'))
+                    traverse_dirs(subdir.get('Prefix'), lock=lock)
             if result.get('Contents') is not None:
-                with ThreadPoolExecutor(max_workers=N_WORKERS) as executor:
+                with ThreadPoolExecutor(max_workers=32) as executor:
                     futures = executor.map(task, (d['Key'] for d in result.get('Contents')))
                     for _ in futures:
                         pass
 
-    N_WORKERS = 32
-    lock = threading.Lock()
     session = boto3.Session(
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
@@ -70,5 +68,6 @@ def s3download(ctx):
     )
     client = session.client('s3')
     bucket = settings.AWS_STORAGE_BUCKET_NAME
-    traverse_dirs('media')
+    traverse_dirs(settings.AWS_LOCATION)
     utils.print_success('Successfully downloaded AWS S3 media')
+

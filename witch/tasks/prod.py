@@ -55,7 +55,7 @@ def check_service(ctx, service):
 
 @task
 def deploy(ctx):
-    with aws.dump_secrets(ctx):
+    with aws.download_secrets(ctx):
         utils.migrate(ctx)
         ctx.run('ssh {}@{} -C "sudo docker image prune -a -f"'.format(
             settings.WITCH_DOCKER_MACHINE['user'],
