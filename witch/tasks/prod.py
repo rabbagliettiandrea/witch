@@ -18,37 +18,27 @@ if WITCH_DOCKER_MACHINE:
         'DOCKER_MACHINE_NAME': WITCH_DOCKER_MACHINE['name']
     }
 
-
-@task
-def ps(ctx):
-    cmd = 'docker-compose -f docker-compose.prod.yml ps'
-    ctx.run(cmd, env=DOCKER_MACHINE_ENV)
+_DOCKER_COMPOSE_COMMAND = 'docker-compose -f ./docker/docker-compose.prod.yml'
 
 
 @task
 def logs(ctx, follow=False):
-    cmd = 'docker-compose -f docker-compose.prod.yml logs'
     ctx.run(
-        '{} -f'.format(cmd) if follow else cmd,
+        '{} logs {}'.format(_DOCKER_COMPOSE_COMMAND, '-f' if follow else ''),
         env=DOCKER_MACHINE_ENV
     )
 
 
 def start_service(ctx, service, rebuild=False):
     return ctx.run(
-        'docker-compose -f docker-compose.prod.yml '
-        'up -d {build_param} --remove-orphans {service}'.format(
-            build_param='--build' if rebuild else '',
-            service=service
-        ),
+        '{} up -d {} --remove-orphans {}'.format(_DOCKER_COMPOSE_COMMAND, '--build' if rebuild else '', service),
         env=DOCKER_MACHINE_ENV
     )
 
 
 def check_service(ctx, service):
     return ctx.run(
-        'docker-compose -f docker-compose.prod.yml '
-        'run --use-aliases nginx curl {}:8000 --head'.format(service),
+        '{} run --use-aliases nginx curl {}:8000 --head'.format(_DOCKER_COMPOSE_COMMAND, service),
         env=DOCKER_MACHINE_ENV, pty=True, warn=True, hide=True
     )
 
@@ -75,5 +65,8 @@ def deploy(ctx):
 
 @task
 def exec(ctx, service='django-green', command='bash'):
-    cmd = 'docker-compose -f docker-compose.prod.yml exec {} {}'.format(service, command)
-    ctx.run(cmd, env=DOCKER_MACHINE_ENV, pty=True)
+    ctx.run(
+        '{} exec {} {}'.format(_DOCKER_COMPOSE_COMMAND, service, command),
+        env=DOCKER_MACHINE_ENV,
+        pty=True
+    )
