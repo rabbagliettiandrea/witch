@@ -53,9 +53,9 @@ def deploy(ctx):
         ))
         start_service(ctx, 'nginx', rebuild=True)
         start_service(ctx, 'django-blue', rebuild=True)
+        utils.print_info('Sleeping waiting for "django-blue"')
         while not check_service(ctx, 'django-blue').ok:
-            sleep(1)
-            utils.print_info('Sleeping waiting for "django-blue"')
+            sleep(0.1)
         start_service(ctx, 'django-green')
         start_service(ctx, 'worker')
         start_service(ctx, 'beat')
