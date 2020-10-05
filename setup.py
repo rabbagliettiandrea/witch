@@ -7,7 +7,7 @@ setup(
     version=VERSION,
     packages=find_packages(),
     include_package_data=True,
-    url='https://github.com/spesa-online/witch',
+    url='https://github.com/rabbagliettiandrea/witch',
     install_requires=[
         'invoke==1.2.0',
         'slackclient~=2.0', 

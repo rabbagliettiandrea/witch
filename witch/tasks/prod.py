@@ -70,3 +70,8 @@ def exec(ctx, service='django-green', command='bash'):
         env=DOCKER_MACHINE_ENV,
         pty=True
     )
+
+
+@task
+def shell(ctx, service='django-green'):
+    return exec(ctx, service, command='python manage.py shell')
