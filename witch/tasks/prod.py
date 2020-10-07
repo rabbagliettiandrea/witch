@@ -21,14 +21,6 @@ if WITCH_DOCKER_MACHINE:
 _DOCKER_COMPOSE_COMMAND = 'docker-compose -f ./docker/docker-compose.prod.yml'
 
 
-@task
-def logs(ctx, follow=False):
-    ctx.run(
-        '{} logs {}'.format(_DOCKER_COMPOSE_COMMAND, '-f' if follow else ''),
-        env=DOCKER_MACHINE_ENV
-    )
-
-
 def start_service(ctx, service, rebuild=False):
     return ctx.run(
         '{} up -d {} --remove-orphans {}'.format(_DOCKER_COMPOSE_COMMAND, '--build' if rebuild else '', service),
@@ -40,11 +32,12 @@ def check_service(ctx, service):
     return ctx.run(
         '{} run --use-aliases nginx curl {}:8000 --head'.format(_DOCKER_COMPOSE_COMMAND, service),
         env=DOCKER_MACHINE_ENV, pty=True, warn=True, hide=True
-    )
+    ).ok
 
 
 @task
 def deploy(ctx):
+    utils.print_info('Deploy started')
     with aws.download_secrets(ctx):
         utils.migrate(ctx)
         ctx.run('ssh {}@{} -C "sudo docker image prune -a -f"'.format(
@@ -54,7 +47,7 @@ def deploy(ctx):
         start_service(ctx, 'nginx', rebuild=True)
         start_service(ctx, 'django-blue', rebuild=True)
         utils.print_info('Sleeping waiting for "django-blue"')
-        while not check_service(ctx, 'django-blue').ok:
+        while not check_service(ctx, 'django-blue'):
             sleep(0.1)
         start_service(ctx, 'django-green')
         start_service(ctx, 'worker')

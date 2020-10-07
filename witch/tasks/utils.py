@@ -1,30 +1,31 @@
 from invoke import task
 from invoke.exceptions import Exit
 from termcolor import colored
+from datetime import datetime
 
 
-def _print_colored(msg, color):
-    print(colored(f'\n-- {msg} --\n', color))
+def _print(msg, color):
+    print(colored('\n-- [{:%H:%M:%S}] {} --\n'.format(datetime.now(), msg), color))
 
 
 def print_task_done():
-    _print_colored('TASK DONE', 'green')
+    _print('TASK DONE', 'green')
 
 
 def print_info(msg):
-    _print_colored(msg, 'blue')
+    _print(msg, 'blue')
 
 
 def print_success(msg):
-    _print_colored(msg, 'green')
+    _print(msg, 'green')
 
 
 def print_warning(msg):
-    _print_colored(msg, 'yellow')
+    _print(msg, 'yellow')
 
 
 def print_error(msg):
-    _print_colored(msg, 'red')
+    _print(msg, 'red')
 
 
 def abort():
