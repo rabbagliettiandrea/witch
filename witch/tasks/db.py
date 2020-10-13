@@ -26,7 +26,7 @@ COMMANDS = {
 
 def _get_params():
     db_default = settings.DATABASES['default']
-    db_replica = settings.DATABASES['replica']
+    db_download = settings.DATABASES['download']
     restore_host = db_default['HOST']
     if 'amazonaws.com' in restore_host:
         utils.print_error('[DISASTER PROTECTION] You\'re trying to restore to Amazon RDS')
@@ -38,11 +38,11 @@ def _get_params():
         'restore_password': db_default['PASSWORD'],
         'restore_name': db_default['NAME'],
 
-        'dump_host': db_replica['HOST'],
-        'dump_port': db_replica['PORT'],
-        'dump_user': db_replica['USER'],
-        'dump_password': db_replica['PASSWORD'],
-        'dump_name': db_replica['NAME']
+        'dump_host': db_download['HOST'],
+        'dump_port': db_download['PORT'],
+        'dump_user': db_download['USER'],
+        'dump_password': db_download['PASSWORD'],
+        'dump_name': db_download['NAME']
     }
 
 
