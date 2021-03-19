@@ -50,7 +50,8 @@ def deploy(ctx):
         while not check_service(ctx, 'django-blue'):
             sleep(0.1)
         start_service(ctx, 'django-green')
-        start_service(ctx, 'worker')
+        for worker_service in getattr(settings, 'WITCH_WORKER_SERVICES', []):
+            start_service(ctx, worker_service)
         start_service(ctx, 'beat')
     utils.print_task_done()
     slackbot.send('Deploy *ended* :satellite_antenna:')
