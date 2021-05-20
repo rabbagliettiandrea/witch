@@ -18,7 +18,7 @@ if WITCH_DOCKER_MACHINE:
         'DOCKER_MACHINE_NAME': WITCH_DOCKER_MACHINE['name']
     }
 
-_DOCKER_COMPOSE_COMMAND = 'docker compose -f ./docker/docker-compose.prod.yml'
+_DOCKER_COMPOSE_COMMAND = 'docker-compose -f ./docker/docker-compose.prod.yml'
 
 
 def start_service(ctx, service, rebuild=False):
