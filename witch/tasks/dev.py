@@ -9,7 +9,7 @@ DOCKER_MACHINE_ENV = {
     'DOCKER_MACHINE_NAME': ''
 }
 
-_DOCKER_COMPOSE_COMMAND = 'docker-compose -f ./docker/docker-compose.dev.yml'
+_DOCKER_COMPOSE_COMMAND = 'docker-compose --env-file ./.env -f ./docker/docker-compose.dev.yml'
 
 
 @task
