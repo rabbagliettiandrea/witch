@@ -1,71 +1,57 @@
 from invoke import task
 from django.conf import settings
-
-from witch import slackbot
 from witch.tasks import aws, utils
+import paramiko
 
-import functools
+WITCH_HOST_NAMES = getattr(settings, 'WITCH_HOST_NAMES', [])
 
-from time import sleep
-
-WITCH_DOCKER_MACHINE = getattr(settings, 'WITCH_DOCKER_MACHINE', None)
-
-if WITCH_DOCKER_MACHINE:
-    DOCKER_MACHINE_ENV = {
-        'DOCKER_TLS_VERIFY': '1',
-        'DOCKER_HOST': 'tcp://{}:2376'.format(WITCH_DOCKER_MACHINE['host']),
-        'DOCKER_CERT_PATH': WITCH_DOCKER_MACHINE['cert_path'],
-        'DOCKER_MACHINE_NAME': WITCH_DOCKER_MACHINE['name']
-    }
-
-_DOCKER_COMPOSE_COMMAND = 'docker-compose --env-file ./.env -f ./docker/docker-compose.prod.yml'
+WITCH_HOST_USER = getattr(settings, 'WITCH_HOST_USER', None)
 
 
-def start_service(ctx, service, rebuild=False):
-    return ctx.run(
-        '{} up -d {} --remove-orphans {}'.format(_DOCKER_COMPOSE_COMMAND, '--build' if rebuild else '', service),
-        env=DOCKER_MACHINE_ENV
-    )
+def get_ssh_client():
+    for host in WITCH_HOST_NAMES:
+        try:
+            ssh_client = paramiko.client.SSHClient()
+            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh_client.remote_host = host
+            ssh_client.connect(hostname=host, username=WITCH_HOST_USER)
+            return ssh_client
+        except:
+            continue
+
+    utils.print_error('No hosts available')
+    utils.abort()
 
 
-def check_service(ctx, service):
-    return ctx.run(
-        '{} run --use-aliases nginx curl {}:8000 --head'.format(_DOCKER_COMPOSE_COMMAND, service),
-        env=DOCKER_MACHINE_ENV, pty=True, warn=True, hide=True
-    ).ok
-
-
-@task
-def deploy(ctx):
-    utils.print_info('Deploy started')
-    with aws.download_secrets(ctx):
-        utils.migrate(ctx)
-        ctx.run('ssh {}@{} -C "sudo docker image prune -a -f"'.format(
-            settings.WITCH_DOCKER_MACHINE['user'],
-            settings.WITCH_DOCKER_MACHINE['host']
-        ))
-        start_service(ctx, 'nginx', rebuild=True)
-        start_service(ctx, 'django-blue', rebuild=True)
-        utils.print_info('Sleeping waiting for "django-blue"')
-        while not check_service(ctx, 'django-blue'):
-            sleep(0.1)
-        start_service(ctx, 'django-green')
-        for worker_service in getattr(settings, 'WITCH_WORKER_SERVICES', []):
-            start_service(ctx, worker_service)
-        start_service(ctx, 'beat')
-    utils.print_task_done()
-    slackbot.send('Deploy *ended* :satellite_antenna:')
+def get_pod_name(ssh_client, service):
+    try:
+        return ssh_client.exec_command(
+            'kubectl get pods -l app={} -o jsonpath="{{.items[0].metadata.name}}"'.format(service)
+        )[1].read().decode('utf-8').strip()
+    except:
+        utils.print_error('Pod name not found')
+        utils.abort()
 
 
 @task
-def exec(ctx, service='django-green', command='bash'):
+def exec(ctx, service='django', command='bash'):
+    if WITCH_HOST_USER is None:
+        utils.print_error('WITCH_HOST_USER setting not found.')
+        utils.abort()
+
+    ssh_client = get_ssh_client()
+    pod_name = get_pod_name(ssh_client, service)
     ctx.run(
-        '{} exec {} {}'.format(_DOCKER_COMPOSE_COMMAND, service, command),
-        env=DOCKER_MACHINE_ENV,
+        'ssh -t {}@{} -C "kubectl exec -it {} -- {}"'.format(
+            WITCH_HOST_USER,
+            ssh_client.remote_host,
+            pod_name,
+            command
+        ),
         pty=True
     )
 
 
 @task
-def shell(ctx, service='django-green'):
+def shell(ctx, service='django'):
     return exec(ctx, service, command='python manage.py shell')

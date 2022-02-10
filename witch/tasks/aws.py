@@ -1,36 +1,10 @@
 import os
 import threading
 from concurrent.futures.thread import ThreadPoolExecutor
-
 from django.conf import settings
-
 import boto3
-from contextlib import contextmanager
-
 from invoke import task
-
 from witch.tasks import utils
-
-
-@contextmanager
-def download_secrets(ctx):
-    if hasattr(settings, 'WITCH_AWS_SECRET'):
-        utils.print_info('Downloading AWS Secret')
-        filename = '.env.prod'
-        session = boto3.session.Session(profile_name=settings.WITCH_AWS_SECRET['profile'])
-        client = session.client(service_name='secretsmanager', region_name=settings.WITCH_AWS_SECRET['region'])
-        get_secret_value_response = client.get_secret_value(SecretId=settings.WITCH_AWS_SECRET['name'])
-        secrets = get_secret_value_response['SecretString']
-        if not secrets:
-            utils.print_error('AWS Data secrets empty')
-            utils.abort()
-        with open(filename, 'w') as fd:
-            fd.write(secrets + '\n')
-        yield
-        utils.print_info('Removing .env.prod file')
-        os.remove(filename)
-    else:
-        yield
 
 
 @task
