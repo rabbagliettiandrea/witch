@@ -3,18 +3,18 @@ from django.conf import settings
 from witch.tasks import aws, utils
 import paramiko
 
-WITCH_HOST_NAMES = getattr(settings, 'WITCH_HOST_NAMES', [])
+WITCH_HOST_NAMES = getattr(settings, 'WITCH_K8S_NODES', [])
 
-WITCH_HOST_USER = getattr(settings, 'WITCH_HOST_USER', None)
+WITCH_HOST_USER = getattr(settings, 'WITCH_SSH_USER', None)
 
 
 def get_ssh_client():
-    for host in WITCH_HOST_NAMES:
+    for host in WITCH_K8S_NODES:
         try:
             ssh_client = paramiko.client.SSHClient()
             ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh_client.remote_host = host
-            ssh_client.connect(hostname=host, username=WITCH_HOST_USER)
+            ssh_client.connect(hostname=host, username=WITCH_SSH_USER)
             return ssh_client
         except:
             continue
@@ -35,15 +35,15 @@ def get_pod_name(ssh_client, service):
 
 @task
 def exec(ctx, service='django', command='bash'):
-    if WITCH_HOST_USER is None:
-        utils.print_error('WITCH_HOST_USER setting not found.')
+    if WITCH_SSH_USER is None:
+        utils.print_error('WITCH_SSH_USER setting not found.')
         utils.abort()
 
     ssh_client = get_ssh_client()
     pod_name = get_pod_name(ssh_client, service)
     ctx.run(
         'ssh -t {}@{} -C "kubectl exec -it {} -- {}"'.format(
-            WITCH_HOST_USER,
+            WITCH_SSH_USER,
             ssh_client.remote_host,
             pod_name,
             command
