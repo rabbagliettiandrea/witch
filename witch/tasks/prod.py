@@ -31,6 +31,7 @@ def exec(ctx, service='django', command='bash'):
     utils.print_error('No nodes available')
     utils.abort()
 
+
 @task
 def shell(ctx, service='django'):
     return exec(ctx, service, command='python manage.py shell')
