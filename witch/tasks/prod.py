@@ -18,10 +18,11 @@ def exec(ctx, service='django', command='bash'):
     for node in random.choices(WITCH_K8S_NODES):
         try:
             a = ctx.run(
-                'ssh -t {}@{} -C "kubectl exec -it {} -- {}"'.format(
+                'ssh -t {}@{} -C "kubectl exec -it \$({}) -- {}"'.format(
                     WITCH_SSH_USER,
                     node,
-                    '\$(kubectl get pods -l app={} -o jsonpath="{{.items[0].metadata.name}}")'.format(service),
+                    "kubectl get pods -l app={} | grep Running | "
+                    "sed 's/|/ /' | awk '{{print $1}}' | shuf -n 1".format(service),
                     command
                 ),
                 pty=True, warn=False
