@@ -21,8 +21,7 @@ def exec(ctx, service='django', command='bash'):
                 'ssh -t {}@{} -C "kubectl exec -it \$({}) -- {}"'.format(
                     WITCH_SSH_USER,
                     node,
-                    "kubectl get pods -l app={} | grep Running | "
-                    "sed 's/|/ /' | awk '{{print $1}}' | shuf -n 1".format(service),
+                    "kubectl get pods -l app={} | grep 'Running' | sed 's/|/ /' | awk '{{print $1}}' | shuf -n 1".format(service),
                     command
                 ),
                 pty=True, warn=False
