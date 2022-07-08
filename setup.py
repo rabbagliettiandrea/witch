@@ -12,7 +12,7 @@ setup(
         'invoke==1.2.0',
         'termcolor==1.1.0',
         'boto3~=1.9',
-        'python-dotenv==0.15.0'
+        'python-dotenv==0.20.0'
     ],
     entry_points={
         'console_scripts': ['witch = witch.main:program.run']
