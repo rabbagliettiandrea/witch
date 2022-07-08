@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 from dotenv import dotenv_values
 
-VERSION = '0.1.dev-1'
+__version__ = '0.1.dev-1'
 
 config = dotenv_values('.env')
 
