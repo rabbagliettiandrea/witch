@@ -1,6 +1,6 @@
 from invoke import Collection, Program
 
-from witch import VERSION
+from witch import __version__ as VERSION
 from .tasks import dev, prod, utils, db, aws
 
 namespace = Collection()
